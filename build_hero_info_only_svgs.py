@@ -1,0 +1,476 @@
+import os
+import xml.etree.ElementTree as ET
+
+def create_info_only_svgs():
+    def generate_svg(is_dark=True):
+        if is_dark:
+            bg_base = "#030712"
+            card_bg = "rgba(15, 23, 42, 0.78)"
+            header_bg = "rgba(30, 41, 59, 0.90)"
+            inset_bg = "rgba(7, 12, 24, 0.70)"
+            card_stroke = "rgba(255, 255, 255, 0.12)"
+            pill_bg = "rgba(30, 41, 59, 0.65)"
+            pill_stroke = "rgba(255, 255, 255, 0.14)"
+            
+            text_primary = "#F8FAFC"
+            text_secondary = "#94A3B8"
+            text_muted = "#64748B"
+            
+            grad_c1 = "#A855F7"  # Purple
+            grad_c2 = "#06B6D4"  # Cyan
+            grad_c3 = "#10B981"  # Emerald
+
+            glow_blob1 = "#7C3AED"
+            glow_blob2 = "#06B6D4"
+            glow_blob3 = "#10B981"
+            blob_opacity = "0.22"
+            grid_stroke = "rgba(255, 255, 255, 0.03)"
+            shimmer_color = "rgba(168, 85, 247, 0.25)"
+
+            social_bg = "rgba(124, 58, 237, 0.14)"
+            social_stroke = "rgba(34, 211, 238, 0.4)"
+            social_text = "#F1F5F9"
+        else:
+            bg_base = "#FFFFFF"
+            card_bg = "rgba(248, 250, 252, 0.88)"
+            header_bg = "rgba(241, 245, 249, 0.95)"
+            inset_bg = "rgba(248, 250, 252, 0.92)"
+            card_stroke = "rgba(15, 23, 42, 0.08)"
+            pill_bg = "rgba(241, 245, 249, 0.85)"
+            pill_stroke = "rgba(15, 23, 42, 0.10)"
+            
+            text_primary = "#0F172A"
+            text_secondary = "#475569"
+            text_muted = "#64748B"
+            
+            grad_c1 = "#2563EB"  # Royal Blue
+            grad_c2 = "#06B6D4"  # Cyan
+            grad_c3 = "#10B981"  # Teal
+
+            glow_blob1 = "#3B82F6"
+            glow_blob2 = "#06B6D4"
+            glow_blob3 = "#10B981"
+            blob_opacity = "0.10"
+            grid_stroke = "rgba(15, 23, 42, 0.03)"
+            shimmer_color = "rgba(37, 99, 235, 0.20)"
+
+            social_bg = "rgba(37, 99, 235, 0.09)"
+            social_stroke = "rgba(6, 182, 212, 0.4)"
+            social_text = "#0F172A"
+
+        svg_content = f'''<svg width="100%" height="100%" viewBox="0 0 1180 610" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- Glow & Shadow Filters -->
+    <filter id="ambientGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="24" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="pillGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="{ '0.50' if is_dark else '0.12' }"/>
+    </filter>
+
+    <!-- Linear Gradients -->
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="{grad_c1}">
+        <animate attributeName="stop-color" values="{grad_c1};{grad_c2};{grad_c3};{grad_c1}" dur="14s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="50%" stop-color="{grad_c2}">
+        <animate attributeName="stop-color" values="{grad_c2};{grad_c3};{grad_c1};{grad_c2}" dur="14s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="{grad_c3}">
+        <animate attributeName="stop-color" values="{grad_c3};{grad_c1};{grad_c2};{grad_c3}" dur="14s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+
+    <linearGradient id="borderShimmer" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="{card_stroke}"/>
+      <stop offset="50%" stop-color="{shimmer_color}">
+        <animate attributeName="stop-color" values="{shimmer_color};{grad_c2};{shimmer_color}" dur="5s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="{card_stroke}"/>
+    </linearGradient>
+
+    <!-- Grid Pattern -->
+    <pattern id="cyberGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="{grid_stroke}" stroke-width="1"/>
+      <circle cx="24" cy="24" r="1" fill="{grid_stroke}"/>
+    </pattern>
+
+    <!-- Typing Clips for 7 phrases (Loop Total: 28s -> 4s per phrase) -->
+    <clipPath id="clipP1">
+      <rect x="154" y="170" width="0" height="34">
+        <animate attributeName="width" values="0; 215; 215; 0; 0" keyTimes="0; 0.05; 0.11; 0.13; 1" dur="28s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <clipPath id="clipP2">
+      <rect x="154" y="170" width="0" height="34">
+        <animate attributeName="width" values="0; 0; 240; 240; 0; 0" keyTimes="0; 0.14; 0.19; 0.25; 0.27; 1" dur="28s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <clipPath id="clipP3">
+      <rect x="154" y="170" width="0" height="34">
+        <animate attributeName="width" values="0; 0; 275; 275; 0; 0" keyTimes="0; 0.28; 0.33; 0.39; 0.41; 1" dur="28s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <clipPath id="clipP4">
+      <rect x="154" y="170" width="0" height="34">
+        <animate attributeName="width" values="0; 0; 165; 165; 0; 0" keyTimes="0; 0.42; 0.47; 0.53; 0.55; 1" dur="28s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <clipPath id="clipP5">
+      <rect x="154" y="170" width="0" height="34">
+        <animate attributeName="width" values="0; 0; 185; 185; 0; 0" keyTimes="0; 0.56; 0.61; 0.67; 0.69; 1" dur="28s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <clipPath id="clipP6">
+      <rect x="154" y="170" width="0" height="34">
+        <animate attributeName="width" values="0; 0; 175; 175; 0; 0" keyTimes="0; 0.70; 0.75; 0.81; 0.83; 1" dur="28s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <clipPath id="clipP7">
+      <rect x="154" y="170" width="0" height="34">
+        <animate attributeName="width" values="0; 0; 205; 205; 0; 0" keyTimes="0; 0.84; 0.89; 0.96; 0.98; 1" dur="28s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+
+    <!-- Card Rounded Clip Paths -->
+    <clipPath id="fullCardClip">
+      <rect x="32" y="32" width="1116" height="546" rx="20" ry="20"/>
+    </clipPath>
+  </defs>
+
+  <!-- Base Canvas Background -->
+  <rect width="1180" height="610" rx="24" fill="{bg_base}"/>
+
+  <!-- Ambient Animated Lighting Blobs -->
+  <g filter="url(#ambientGlow)">
+    <circle cx="250" cy="140" r="280" fill="{glow_blob1}" opacity="{blob_opacity}">
+      <animateTransform attributeName="transform" type="translate" values="0 0; 40 30; 0 0" dur="10s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="950" cy="460" r="300" fill="{glow_blob2}" opacity="{blob_opacity}">
+      <animateTransform attributeName="transform" type="translate" values="0 0; -50 -35; 0 0" dur="14s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="600" cy="300" r="240" fill="{glow_blob3}" opacity="{float(blob_opacity)*0.8:.2f}">
+      <animateTransform attributeName="transform" type="translate" values="0 0; 30 -25; 0 0" dur="12s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Floating Tech Code Particles -->
+  <g fill="{text_muted}" font-family="'JetBrains Mono', monospace" font-size="11" opacity="0.22">
+    <text x="70" y="590">&lt;/code&gt;
+      <animateTransform attributeName="transform" type="translate" values="0 0; 0 -15; 0 0" dur="8s" repeatCount="indefinite"/>
+    </text>
+    <text x="960" y="80">const ai = new NeuralNet();
+      <animateTransform attributeName="transform" type="translate" values="0 0; 0 15; 0 0" dur="9s" repeatCount="indefinite"/>
+    </text>
+    <text x="500" y="592">&#123; ...state &#125;
+      <animateTransform attributeName="transform" type="translate" values="0 0; 15 0; 0 0" dur="10s" repeatCount="indefinite"/>
+    </text>
+  </g>
+
+  <!-- Background Cyber Grid Mesh -->
+  <rect width="1180" height="610" rx="24" fill="url(#cyberGrid)"/>
+
+  <!-- Outer Canvas Edge -->
+  <rect x="1" y="1" width="1178" height="608" rx="23" fill="none" stroke="{card_stroke}" stroke-width="1.5"/>
+
+  <!-- ========================================================= -->
+  <!-- FULL WIDTH SINGLE GLASS TERMINAL CARD (INFO ONLY)          -->
+  <!-- ========================================================= -->
+  <g id="info-panel" filter="url(#cardShadow)">
+    <rect x="32" y="32" width="1116" height="546" rx="20" fill="{card_bg}" stroke="url(#borderShimmer)" stroke-width="1.5"/>
+
+    <!-- Terminal Header Bar -->
+    <g clip-path="url(#fullCardClip)">
+      <rect x="32" y="32" width="1116" height="42" fill="{header_bg}"/>
+      <line x1="32" y1="74" x2="1148" y2="74" stroke="{card_stroke}" stroke-width="1"/>
+      
+      <!-- Window Controls -->
+      <circle cx="58" cy="53" r="5.5" fill="#FF5F56"/>
+      <circle cx="76" cy="53" r="5.5" fill="#FFBD2E"/>
+      <circle cx="94" cy="53" r="5.5" fill="#27C93F"/>
+      
+      <!-- Header Title -->
+      <text x="590" y="57" text-anchor="middle" fill="{text_secondary}" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600">developer_profile.ts — ujjwal@dev</text>
+      
+      <!-- Version Tag -->
+      <rect x="1070" y="44" width="62" height="18" rx="5" fill="rgba(34, 211, 238, 0.12)" stroke="rgba(34, 211, 238, 0.3)" stroke-width="1"/>
+      <text x="1101" y="57" text-anchor="middle" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="700">TS v5.4</text>
+    </g>
+
+    <!-- 1. GREETING & NAME SECTION -->
+    <g id="greeting-section">
+      <rect x="64" y="96" width="192" height="26" rx="13" fill="rgba(168, 85, 247, 0.12)" stroke="rgba(168, 85, 247, 0.3)" stroke-width="1"/>
+      <circle cx="78" cy="109" r="4" fill="{grad_c1}"/>
+      <text x="90" y="113" fill="{grad_c1}" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" letter-spacing="0.5px">WELCOME TO MY PROFILE</text>
+
+      <text x="64" y="152" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="40" font-weight="800" letter-spacing="-0.8px">
+        Hi 👋 I'm <tspan fill="url(#primaryGrad)">Ujjwal Kumar</tspan>
+      </text>
+    </g>
+
+    <!-- 2. ANIMATED TERMINAL TYPING SECTION (7 PHRASES) -->
+    <g id="typing-section">
+      <rect x="64" y="168" width="1052" height="42" rx="11" fill="{inset_bg}" stroke="{card_stroke}" stroke-width="1"/>
+      <text x="84" y="194" fill="{text_secondary}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">&gt; role:</text>
+      
+      <g clip-path="url(#clipP1)">
+        <text x="154" y="194" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">Frontend Engineer</text>
+      </g>
+      <g clip-path="url(#clipP2)">
+        <text x="154" y="194" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">Full Stack Developer</text>
+      </g>
+      <g clip-path="url(#clipP3)">
+        <text x="154" y="194" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">Open Source Contributor</text>
+      </g>
+      <g clip-path="url(#clipP4)">
+        <text x="154" y="194" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">AI Enthusiast</text>
+      </g>
+      <g clip-path="url(#clipP5)">
+        <text x="154" y="194" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">MERN Developer</text>
+      </g>
+      <g clip-path="url(#clipP6)">
+        <text x="154" y="194" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">Java Developer</text>
+      </g>
+      <g clip-path="url(#clipP7)">
+        <text x="154" y="194" fill="{grad_c2}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700">Android Developer</text>
+      </g>
+
+      <rect y="179" width="3" height="20" fill="{grad_c2}">
+        <animate attributeName="x" 
+                 values="154; 369; 369; 154; 154; 394; 394; 154; 154; 429; 429; 154; 154; 319; 319; 154; 154; 339; 339; 154; 154; 329; 329; 154; 154; 359; 359; 154" 
+                 keyTimes="0; 0.05; 0.11; 0.13; 0.14; 0.19; 0.25; 0.27; 0.28; 0.33; 0.39; 0.41; 0.42; 0.47; 0.53; 0.55; 0.56; 0.61; 0.67; 0.69; 0.70; 0.75; 0.81; 0.83; 0.84; 0.89; 0.96; 0.98" 
+                 dur="28s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+
+    <!-- 3. ABOUT SECTION (Clean Row of Glass Capsules) -->
+    <g id="about-section">
+      <!-- 1. B.Tech Computer Science -->
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="5s" repeatCount="indefinite"/>
+        <rect x="64" y="226" width="220" height="34" rx="10" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1"/>
+        <text x="80" y="248" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">🎓 B.Tech Computer Science</text>
+      </g>
+      <!-- 2. Software Developer -->
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="5.3s" repeatCount="indefinite" begin="0.4s"/>
+        <rect x="300" y="226" width="175" height="34" rx="10" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1"/>
+        <text x="316" y="248" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">💻 Software Developer</text>
+      </g>
+      <!-- 3. AI Engineer -->
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="5.6s" repeatCount="indefinite" begin="0.8s"/>
+        <rect x="491" y="226" width="135" height="34" rx="10" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1"/>
+        <text x="507" y="248" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">🤖 AI Engineer</text>
+      </g>
+      <!-- 4. Email -->
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="5.9s" repeatCount="indefinite" begin="1.2s"/>
+        <rect x="642" y="226" width="280" height="34" rx="10" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1"/>
+        <text x="658" y="248" fill="{text_primary}" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600">📧 kumarujjwal1203@gmail.com</text>
+      </g>
+      <!-- 5. India -->
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="6.2s" repeatCount="indefinite" begin="1.6s"/>
+        <rect x="938" y="226" width="95" height="34" rx="10" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1"/>
+        <text x="954" y="248" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">🌍 India</text>
+      </g>
+    </g>
+
+    <!-- 4. SKILLS SECTION (2 SPACIOUS ROWS OF CAPSULES) -->
+    <g id="skills-section">
+      <text x="64" y="292" fill="{text_muted}" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" letter-spacing="1.5px">// FUTURISTIC TECH CAPSULES &amp; SKILLS</text>
+
+      <!-- Row 1 (y=306) -->
+      <!-- React -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4s" repeatCount="indefinite" begin="0s"/>
+        <rect x="64" y="306" width="105" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="82" cy="323" r="4" fill="#61DAFB"/>
+        <text x="94" y="328" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">React</text>
+      </g>
+      <!-- Next.js -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.2s" repeatCount="indefinite" begin="0.3s"/>
+        <rect x="181" y="306" width="112" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="199" cy="323" r="4" fill="{text_primary}"/>
+        <text x="211" y="328" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Next.js</text>
+      </g>
+      <!-- Node.js -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.4s" repeatCount="indefinite" begin="0.6s"/>
+        <rect x="305" y="306" width="114" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="323" cy="323" r="4" fill="#5FA04E"/>
+        <text x="335" y="328" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Node.js</text>
+      </g>
+      <!-- Express -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.6s" repeatCount="indefinite" begin="0.9s"/>
+        <rect x="431" y="306" width="110" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="449" cy="323" r="4" fill="#F59E0B"/>
+        <text x="461" y="328" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Express</text>
+      </g>
+      <!-- MongoDB -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.8s" repeatCount="indefinite" begin="1.2s"/>
+        <rect x="553" y="306" width="124" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="571" cy="323" r="4" fill="#47A248"/>
+        <text x="583" y="328" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">MongoDB</text>
+      </g>
+      <!-- TypeScript -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.1s" repeatCount="indefinite" begin="0.2s"/>
+        <rect x="689" y="306" width="136" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="707" cy="323" r="4" fill="#3178C6"/>
+        <text x="719" y="328" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">TypeScript</text>
+      </g>
+      <!-- Tailwind CSS -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.3s" repeatCount="indefinite" begin="0.5s"/>
+        <rect x="837" y="306" width="146" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="855" cy="323" r="4" fill="#06B6D4"/>
+        <text x="867" y="328" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Tailwind CSS</text>
+      </g>
+
+      <!-- Row 2 (y=354) -->
+      <!-- Python -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.5s" repeatCount="indefinite" begin="0.8s"/>
+        <rect x="64" y="354" width="110" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="82" cy="371" r="4" fill="#3776AB"/>
+        <text x="94" y="376" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Python</text>
+      </g>
+      <!-- Java -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.7s" repeatCount="indefinite" begin="1.1s"/>
+        <rect x="186" y="354" width="95" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="204" cy="371" r="4" fill="#ED8B00"/>
+        <text x="216" y="376" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Java</text>
+      </g>
+      <!-- Spring Boot -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.9s" repeatCount="indefinite" begin="1.4s"/>
+        <rect x="293" y="354" width="138" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="311" cy="371" r="4" fill="#6DB33F"/>
+        <text x="323" y="376" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Spring Boot</text>
+      </g>
+      <!-- Android -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.2s" repeatCount="indefinite" begin="0.4s"/>
+        <rect x="443" y="354" width="115" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="461" cy="371" r="4" fill="#3DDC84"/>
+        <text x="473" y="376" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Android</text>
+      </g>
+      <!-- Git -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.4s" repeatCount="indefinite" begin="0.7s"/>
+        <rect x="570" y="354" width="88" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="588" cy="371" r="4" fill="#F05032"/>
+        <text x="600" y="376" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Git</text>
+      </g>
+      <!-- GitHub -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.6s" repeatCount="indefinite" begin="1.0s"/>
+        <rect x="670" y="354" width="112" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="688" cy="371" r="4" fill="{text_primary}"/>
+        <text x="700" y="376" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">GitHub</text>
+      </g>
+      <!-- Docker -->
+      <g filter="url(#pillGlow)">
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.8s" repeatCount="indefinite" begin="1.3s"/>
+        <rect x="794" y="354" width="110" height="34" rx="17" fill="{pill_bg}" stroke="{pill_stroke}" stroke-width="1.2"/>
+        <circle cx="812" cy="371" r="4" fill="#2496ED"/>
+        <text x="824" y="376" fill="{text_primary}" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600">Docker</text>
+      </g>
+    </g>
+
+    <!-- 5. SOCIAL LINKS SECTION (4 ACTION BUTTONS SPANNING THE WIDTH) -->
+    <g id="socials-section">
+      <text x="64" y="438" fill="{text_muted}" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" letter-spacing="1.5px">// CONNECT &amp; REACH OUT</text>
+
+      <!-- GitHub Button -->
+      <a xlink:href="https://github.com/kumarujjwal1203" target="_blank">
+        <g class="social-btn">
+          <rect x="64" y="454" width="240" height="44" rx="12" fill="{social_bg}" stroke="{social_stroke}" stroke-width="1.2">
+            <animate attributeName="stroke-opacity" values="0.4; 0.9; 0.4" dur="3s" repeatCount="indefinite"/>
+          </rect>
+          <path d="M88 470c-3.8 0-7 3.1-7 7 0 3.1 2 5.7 4.8 6.6.3.1.5-.2.5-.4v-1.3c-1.9.4-2.3-1-2.3-1-.4-1-.8-1.2-.8-1.2-.6-.4.1-.4.1-.4.7.1 1.1.7 1.1.7.6 1.1 1.6.8 2 .6.1-.5.3-.8.5-1-1.5-.2-3.1-.8-3.1-3.5 0-.8.3-1.4.7-1.9-.1-.2-.3-.9.1-1.9 0 0 .6-.2 2 .7.6-.2 1.2-.2 1.8-.2s1.2.1 1.8.2c1.4-.9 2-.7 2-.7.4 1 .1 1.7.1 1.9.5.5.7 1.1.7 1.9 0 2.7-1.6 3.3-3.2 3.5.3.3.5.7.5 1.5v2.2c0 .2.2.4.5.3 2.8-.9 4.8-3.5 4.8-6.6 0-3.9-3.1-7-7-7z" fill="{social_text}"/>
+          <text x="108" y="481" fill="{social_text}" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600">GitHub</text>
+        </g>
+      </a>
+
+      <!-- LinkedIn Button -->
+      <a xlink:href="https://www.linkedin.com/in/-ujjwal-k/" target="_blank">
+        <g class="social-btn">
+          <rect x="324" y="454" width="240" height="44" rx="12" fill="{social_bg}" stroke="{social_stroke}" stroke-width="1.2">
+            <animate attributeName="stroke-opacity" values="0.4; 0.9; 0.4" dur="3.3s" repeatCount="indefinite"/>
+          </rect>
+          <path d="M344 468h3v13h-3z M345.5 463c1 0 1.8.8 1.8 1.8s-.8 1.8-1.8 1.8-1.8-.8-1.8-1.8.8-1.8 1.8-1.8z M350 468h2.8v1.8h.1c.4-.7 1.4-1.5 2.8-1.5 3 0 3.5 2 3.5 4.5v7.2h-3v-6.4c0-1.5 0-3.5-2.1-3.5s-2.4 1.7-2.4 3.4v6.5h-3z" fill="{social_text}"/>
+          <text x="368" y="481" fill="{social_text}" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600">LinkedIn</text>
+        </g>
+      </a>
+
+      <!-- Portfolio Button -->
+      <a xlink:href="https://portfolio-2026-iota-swart.vercel.app/" target="_blank">
+        <g class="social-btn">
+          <rect x="584" y="454" width="260" height="44" rx="12" fill="{social_bg}" stroke="{social_stroke}" stroke-width="1.2">
+            <animate attributeName="stroke-opacity" values="0.4; 0.9; 0.4" dur="3.6s" repeatCount="indefinite"/>
+          </rect>
+          <path d="M604 476a7 7 0 1 0 0-14 7 7 0 0 0 0 14z M597 469h14 M604 462c1.8 2 2.7 4.5 2.7 7s-.9 5-2.7 7 M604 462c-1.8 2-2.7 4.5-2.7 7s.9 5 2.7 7" fill="none" stroke="{social_text}" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="630" y="481" fill="{social_text}" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600">Portfolio</text>
+        </g>
+      </a>
+
+      <!-- Email Button -->
+      <a xlink:href="mailto:kumarujjwal1203@gmail.com">
+        <g class="social-btn">
+          <rect x="864" y="454" width="252" height="44" rx="12" fill="{social_bg}" stroke="{social_stroke}" stroke-width="1.2">
+            <animate attributeName="stroke-opacity" values="0.4; 0.9; 0.4" dur="3.9s" repeatCount="indefinite"/>
+          </rect>
+          <path d="M884 468h16v12h-16z M884 468l8 6l8-6" fill="none" stroke="{social_text}" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="912" y="481" fill="{social_text}" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600">Email</text>
+        </g>
+      </a>
+    </g>
+  </g>
+</svg>'''
+        return svg_content
+
+    dark_svg = generate_svg(is_dark=True)
+    light_svg = generate_svg(is_dark=False)
+
+    with open("dark.svg", "w", encoding="utf-8") as f:
+        f.write(dark_svg)
+
+    with open("light.svg", "w", encoding="utf-8") as f:
+        f.write(light_svg)
+
+    # Validate XML Syntax
+    try:
+        ET.fromstring(dark_svg)
+        print("dark.svg XML validation: PASSED")
+    except Exception as e:
+        print("dark.svg XML validation error:", e)
+
+    try:
+        ET.fromstring(light_svg)
+        print("light.svg XML validation: PASSED")
+    except Exception as e:
+        print("light.svg XML validation error:", e)
+
+if __name__ == "__main__":
+    create_info_only_svgs()
